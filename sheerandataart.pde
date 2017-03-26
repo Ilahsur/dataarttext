@@ -500,66 +500,62 @@ void setup()
   loadText(dataPath+"sheeranlyrics.txt");
   size (900,800, P3D);
   cam = new PeasyCam(this, 400.0 );
-  cam.pan(70,400);  
+  cam.pan(-50,600);  
   noSmooth(); 
-  fill(color(0,0,200));
-  stroke(color(255,0,0)); 
+  fill(color(#01AEE1));
+  stroke(color(#FFFFFF)); 
 }
 
 void loadText(String url)
 {
+  concordance = new IntDict();
   String[] lines = loadStrings(url);
-  String allText = join(lines, " ");
+  String allText = join(lines, " ").toLowerCase();
   //String[] sentences = RiTa.splitSentences(allText);
   //int wordcount = RiTa.getWordCount(allText);
-  String[] token = RiTa.tokenize(allText);
-  
-  //for(int j = 0;j<token.length;j++)
-  //{println(token[j]);}
-  //println(allText);
-  
+  String[] token = splitTokens(allText, " ,.?!:;[]-\"()`~@#$%^&*_-+={}|<>/");
   rs = new RiString(allText);
-  String[] words = rs.words();
-  //for(int j = 0;j<words.length;j++)
-  //{println(words[j]);}
-  
-  concordance = new IntDict();
-  
-   for (int i = 0; i < words.length; i++) {
-    String s = words[i].toLowerCase();
+  //rs.replaceAll("the","");
+  //String[] words = rs.words();
+  String[] stopwords = {"a", "the", "is", "and"};
+ 
+   for (int i = 0; i < token.length; i++) {
+    String s = token[i];
     concordance.increment(s);
   }
   
+  //for(int j=0;j<stopwords.length;j++){
+  //  for (int k=0;k<keys.length;k++)
+  //  {
+  //    if(stopwords[j].equals(keys[k])){
+  //      keys[k] = "";
+  //    }
+  //  }
+  //}
+  
   concordance.sortValuesReverse();
-  
-  int h = 10;
   keys = concordance.keyArray();
-   
-  for (int i = 0; i < height/h; i++) {
-    String word = keys[i];
-    count = concordance.get(word);
-    //println(word+": "+count);
-  }
   
-  
-  
-  //for(int i=0;i<line.length;i++)
-  //{println(line[i]); } 
 }
   
   void draw()
 {  
-  //background(0);
-  //noStroke();
-  lights();
-  //translate(20, 20, 0);
-  //sphere(40);
-  
+  int x = 0;
+  int y = 50;
   background(20);
-  WordPaint(keys[1]);
+  for (String word : keys) {
+    int count = concordance.get(word);
+    if (count > 10) {
+      WordPaint(word);
+      translate(0,40,0);
+    }
+    if (x > width) {
+      x = 0;
+      y += 48;
+      if (y > height) {
+        break;
+      }
+    }
+  }
   
-  WordPaint(keys[2]);
-
-  
-  //angle += angleAdd;  
 }
